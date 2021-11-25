@@ -1,101 +1,69 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	// ファイル操作
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
-	"io"
 	"path/filepath"
-	"html/template"
-	"net/http"
+	"time"
 )
 
 func main() {
-	http.HandleFunc("/", handleIndex)
-	http.HandleFunc("/code/", handleCode)
-	// 順番が逆になると404エラー
+	http.HandleFunc("/api/v1/python", handeleExecPython)
 	http.ListenAndServe(":10000", nil)
 }
 
-// index ok
-func handleIndex(w http.ResponseWriter, r *http.Request) {
+type Editor struct {
+	Code string `json:code`
+	Result string `json:result`
+}
+
+func handeleExecPython(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Methods","POST")
+	w.Header().Set("Content-Type", "application/json")
 
 	var result string
-	if r.Method == "POST" {
-		code := r.FormValue("code")
-		result = docker(code)
-		// 結果
-		fmt.Println(result)
-	} else {
-		result = ""
+	var editor Editor
+	length := r.ContentLength
+	body := make([]byte, length)
+	r.Body.Read(body)
+	if err := json.Unmarshal([]byte(body), &editor); err != nil {
+		fmt.Println("Bad Request")
 	}
+	file_name := writeFile(editor.Code)
+	result = dockerRun(file_name)
+	editor.Result = result
 
-	t, err := template.ParseFiles("templates/index.html")
-	if err != nil { 
-		panic(err.Error())
-	}
+	exec.Command(
+		"rm", file_name,
+	).Run()
 
-	
-
-	t.Execute(w,result)
+	// ここでjsonで返す
+	json.NewEncoder(w).Encode(editor)	
 }
 
-func handleCode(w http.ResponseWriter, r *http.Request) {
-	code := r.FormValue("code")
-	docker(code)
-	// Dockerにコードを実行してもらう
-	http.Redirect(w,r,"/", 302)
-}
+// dockerで実行して結果を返す
+func dockerRun(file_name string) string {
 
-// dockerでコードを実行する
-func docker(code string) string {
+	file_dir, _ := os.Getwd()
 
-	// 実行元のディレクトリ
-	// file_dir := "/Users/yamaokatomoki/history"
-	file_dir := "/Users/yamaokatomoki/OnlineCode"
-	// ファイル名を決定する
-	file_name := "pine.py"
-	// ディレクトリとファイル名を結合する
-	file_path := filepath.Join(file_dir, file_name)
-
-	// ファイルを書き込み権限つきで開く
-	f, err := os.Create(file_path)
-	if err != nil {
-		fmt.Println("エラーが発生")
-		fmt.Println(err)
-	}
-	// バイナリデータ
-	data := []byte(code)
-	// 書き込む
-	// count, err := 
-	f.Write(data)
-	// これで表示できる
-	// fmt.Println(string(data[:count]))
-
-	// 実行するコマンド 変数のところは{}にする
-	// docker_cmd := "docker run -i --rm --name my-running-script -v /Users/yamaokatomoki/history:/usr/src/myapp -w /usr/src/myapp python:3.7 python pine.py"
 	cmd := exec.Command(
-		"python",
-		"pine.py",	
-		// "docker",
-		// "run",
-		// "-i",
-		// "--rm",
-		// "python",
-		// "-v",
-		// "/Users/yamaokatomoki/history:/usr/src/myapp",
-		// "-w",
-		// "/usr/src/myapp",
-		// "python:3.7",
-		// "python",
-		// "pine.py",
+		"docker","run","-i","--rm","--name","python-script",
+		"-v", file_dir + ":/usr/src/app",
+		"-w","/usr/src/app",
+		"python:latest",
+		"python", file_name,
 	)
 
 	stdin, err := cmd.StdinPipe()
 
 	if err != nil {
-		fmt.Println("error1")
 		fmt.Println(err)
 	}
 
@@ -103,14 +71,28 @@ func docker(code string) string {
 	stdin.Close()
 	out, err := cmd.CombinedOutput()
 
-	// ここでエラーが発生する
 	if err != nil {
-		fmt.Println("error2")
-		// exit status 1 と表示される
 		fmt.Println(err)
 	}
 
 	return string(out)
-	// fmt.Println(string(out))
-	
+}
+
+// ファイルにコードを書き込む
+func writeFile(code string) string {
+
+	file_dir, _ := os.Getwd()
+	t := time.Now()
+	file_name := t.Format(time.RFC3339) + ".py"
+	file_path := filepath.Join(file_dir, file_name)
+
+	f, err := os.Create(file_path)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	data := []byte(code)
+	f.Write(data)
+	// fmt.Println(string(data[:count]))
+	return file_name
 }
