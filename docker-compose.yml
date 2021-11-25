@@ -1,0 +1,9 @@
+app:
+    container_name: code
+    build: .
+    tty: true
+    ports:
+        - "10000:10000"
+    command: go run main.go
+    volumes:
+        - .:/go/src/work
