@@ -1,9 +1,16 @@
-app:
-    container_name: code
-    build: .
-    tty: true
-    ports:
-        - "10000:10000"
-    command: go run main.go
-    volumes:
-        - .:/go/src/work
+version: "3.7"
+
+volumes:
+    .:
+        
+services:
+    app:
+        container_name: code
+        build: .
+        tty: true
+        ports:
+            - "10000:10000"
+        command: ./main
+        volumes:
+            - .:/go/src/work
+            - /var/run/docker.sock:/var/run/docker.sock
