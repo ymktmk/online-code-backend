@@ -10,6 +10,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build main.go
 
 FROM docker:latest
 
+# /go/src/work/
 COPY --from=builder /go/src/work/main ./
 
 EXPOSE 10000
