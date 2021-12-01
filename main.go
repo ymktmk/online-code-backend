@@ -40,8 +40,9 @@ func handeleExecPython(w http.ResponseWriter, r *http.Request) {
 	result = dockerRun(file_name)
 	editor.Result = result
 
+	// ファイル削除
 	exec.Command(
-		"rm", file_name,
+		"rm","/go/src/work/" + file_name,
 	).Run()
 
 	// ここでjsonで返す
@@ -51,12 +52,11 @@ func handeleExecPython(w http.ResponseWriter, r *http.Request) {
 // dockerで実行して結果を返す
 func dockerRun(file_name string) string {
 
-	file_dir, _ := os.Getwd()
-
+	// コンテナ間マウント
 	cmd := exec.Command(
-		"docker","run","-i","--rm","--name","python-script",
-		"-v", file_dir + ":/usr/src/app",
-		"-w","/usr/src/app",
+		"docker","run","-i","--rm",
+		"--volumes-from","code",
+		"-w","/go/src/work",
 		"python:latest",
 		"python", file_name,
 	)
@@ -81,12 +81,14 @@ func dockerRun(file_name string) string {
 // ファイルにコードを書き込む
 func writeFile(code string) string {
 
-	file_dir, _ := os.Getwd()
 	t := time.Now()
 	file_name := t.Format(time.RFC3339) + ".py"
-	file_path := filepath.Join(file_dir, file_name)
+
+	// コンテナ側に作ってホストと共有
+	file_path := filepath.Join("go/src/work", file_name)
 
 	f, err := os.Create(file_path)
+
 	if err != nil {
 		fmt.Println(err)
 	}

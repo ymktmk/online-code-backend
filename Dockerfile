@@ -1,9 +1,17 @@
-FROM golang:latest
+FROM golang:latest AS builder
 
 RUN mkdir /go/src/work
 
 WORKDIR /go/src/work
 
-COPY . /go/src/work
+COPY main.go .
+
+RUN CGO_ENABLED=0 GOOS=linux go build main.go
+
+FROM docker:latest
+
+# /go/src/work/
+COPY --from=builder /go/src/work/main ./
 
 EXPOSE 10000
+
