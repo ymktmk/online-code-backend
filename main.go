@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/api/v1/python", handeleExecPython)
+	http.HandleFunc("/api/v1/python", handleExecPython)
 	http.ListenAndServe(":10000", nil)
 }
 
@@ -21,7 +21,7 @@ type Editor struct {
 	Result string `json:result`
 }
 
-func handeleExecPython(w http.ResponseWriter, r *http.Request) {
+func handleExecPython(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -29,24 +29,32 @@ func handeleExecPython(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var result string
-	var editor Editor
-	length := r.ContentLength
-	body := make([]byte, length)
+
+	// リクエストbodyのjsonを構造体に変換
+	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
-	if err := json.Unmarshal([]byte(body), &editor); err != nil {
-		fmt.Println("Bad Request")
-	}
+	var editor Editor
+	json.Unmarshal(body, &editor)
+
 	file_name := writeFile(editor.Code)
 	result = dockerRun(file_name)
 	editor.Result = result
 
-	// ファイル削除
 	exec.Command(
 		"rm","/go/src/work/" + file_name,
 	).Run()
 
-	// ここでjsonで返す
-	json.NewEncoder(w).Encode(editor)	
+	editor_json, err := json.Marshal(editor)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(string(editor_json))
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(editor_json)
+	// json.NewEncoder(w).Encode(editor)
 }
 
 // dockerで実行して結果を返す
