@@ -32,7 +32,7 @@ phases:
         commands:
             - docker push $REPOSITORY_URI:$IMAGE_TAG
             # imagedefinitions.jsonに出力する
-            - printf '[{\"name":\"${CONTAINER_NAME}",\"imageUri":\"${REPOSITORY_URI}:${IMAGE_TAG}"}]' > imagedefinitions.json
+            - printf '[{\"name":\"${CONTAINER_NAME}\",\"imageUri\":\"${REPOSITORY_URI}:${IMAGE_TAG}\"}]' > imagedefinitions.json
 
 # CodeBuildがビルド出力を見つけることができる場所に関する情報
 artifacts:
