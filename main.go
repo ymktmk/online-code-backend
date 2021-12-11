@@ -54,7 +54,6 @@ func handleExecPython(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(editor_json)
-	// json.NewEncoder(w).Encode(editor)
 }
 
 // dockerで実行して結果を返す
