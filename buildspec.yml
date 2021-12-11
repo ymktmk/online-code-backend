@@ -6,30 +6,34 @@ env:
     variables:
         AWS_DEFAULT_REGION: 'ap-northeast-1'
         IMAGE_NAME: 'onlinecode_app'
+        CONTAINER_NAME: 'code'
+
 
 # ビルドの各段階で CodeBuild が実行するコマンドを表します
 phases:
     install:
         runtime-versions:
             docker: 18
-
     pre_build:
         commands:
             # ECRにログインする
             - $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION})
-            # AWS_ACCOUNT_IDを取得
+            # AWSのアカウントIDを取得
             - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
-            # ECRのURI
-            - URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_NAME}
-    
+            # ECRのリポジトリURI
+            - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_NAME}
+            # イメージタグ
+            - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
     build:
         commands:
-            - docker build -t $URI:$CODEBUILD_RESOLVED_SOURCE_VERSION .
-            
+            # $IMAGE_TAGがTag名になる
+            - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
     post_build:
         commands:
-            - docker push $URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
-            - printf '{"Version":"1.0","ImageURI":"%s"}' $URI:$CODEBUILD_RESOLVED_SOURCE_VERSION > imagedefinitions.json
+            - docker push $REPOSITORY_URI:$IMAGE_TAG
+            # imagedefinitions.jsonに出力する
+            - echo "[{"name":"${CONTAINER_NAME}","imageUri":"${REPOSITORY_URI}:${IMAGE_TAG}"}]" > imagedefinitions.json
+
 # CodeBuildがビルド出力を見つけることができる場所に関する情報
 artifacts:
     files: imagedefinitions.json
