@@ -23,6 +23,7 @@ phases:
             - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_NAME}
             # イメージタグ
             - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
+
     build:
         commands:
             # $IMAGE_TAGがTag名になる
@@ -31,8 +32,7 @@ phases:
         commands:
             - docker push $REPOSITORY_URI:$IMAGE_TAG
             # imagedefinitions.jsonに出力する
-            - echo '[{"name":"${CONTAINER_NAME}","imageUri":"${REPOSITORY_URI}:${IMAGE_TAG}"}]'
-            - printf '[{"name":"${CONTAINER_NAME}","imageUri":"${REPOSITORY_URI}:${IMAGE_TAG}"}]' > imagedefinitions.json
+            - printf '[{\"name":\"${CONTAINER_NAME}",\"imageUri":\"${REPOSITORY_URI}:${IMAGE_TAG}"}]' > imagedefinitions.json
 
 # CodeBuildがビルド出力を見つけることができる場所に関する情報
 artifacts:
