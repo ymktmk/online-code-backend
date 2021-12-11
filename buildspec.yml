@@ -29,7 +29,7 @@ phases:
     post_build:
         commands:
             - docker push $URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
-            - printf '{"Version":"1.0","ImageURI":"%s"}' $URI:$CODEBUILD_RESOLVED_SOURCE_VERSION > imageDetail.json
+            - printf '{"Version":"1.0","ImageURI":"%s"}' $URI:$CODEBUILD_RESOLVED_SOURCE_VERSION > imagedefinitions.json
 # CodeBuildがビルド出力を見つけることができる場所に関する情報
 artifacts:
-    files: imageDetail.json
+    files: imagedefinitions.json
