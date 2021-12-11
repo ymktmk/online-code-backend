@@ -4,6 +4,7 @@ version: 0.2
 # 環境変数
 env:
     variables:
+        AWS_DEFAULT_REGION: 'ap-northeast-1'
         IMAGE_NAME: 'onlinecode_app'
 
 # ビルドの各段階で CodeBuild が実行するコマンドを表します
