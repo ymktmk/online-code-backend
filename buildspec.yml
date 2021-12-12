@@ -10,9 +10,9 @@ env:
 
 # ビルドの各段階で CodeBuild が実行するコマンドを表します
 phases:
-    install:
-        runtime-versions:
-            docker: 18
+    # install:
+    #     runtime-versions:
+    #         docker: 18
     pre_build:
         commands:
             # ECRにログインする
