@@ -36,6 +36,7 @@ func handleExecPython(w http.ResponseWriter, r *http.Request) {
 	var editor Editor
 	json.Unmarshal(body, &editor)
 
+	// touch file
 	file_name := writeFile(editor.Code)
 	result = dockerRun(file_name)
 	editor.Result = result
@@ -54,6 +55,27 @@ func handleExecPython(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(editor_json)
+}
+
+
+func writeFile(code string) string {
+
+	t := time.Now()
+	file_name := t.Format(time.RFC3339) + ".py"
+
+	// コンテナ側に作ってホストと共有
+	file_path := filepath.Join("go/src/work", file_name)
+
+	f, err := os.Create(file_path)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	data := []byte(code)
+	f.Write(data)
+	// fmt.Println(string(data[:count]))
+	return file_name
 }
 
 // dockerで実行して結果を返す
@@ -85,23 +107,3 @@ func dockerRun(file_name string) string {
 	return string(out)
 }
 
-// ファイルにコードを書き込む
-func writeFile(code string) string {
-
-	t := time.Now()
-	file_name := t.Format(time.RFC3339) + ".py"
-
-	// コンテナ側に作ってホストと共有
-	file_path := filepath.Join("go/src/work", file_name)
-
-	f, err := os.Create(file_path)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	data := []byte(code)
-	f.Write(data)
-	// fmt.Println(string(data[:count]))
-	return file_name
-}
