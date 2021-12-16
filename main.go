@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -12,7 +13,12 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/api/v1/python", handleExecPython)
+	http.HandleFunc("/api/v1/python", handleExec)
+	http.HandleFunc("/api/v1/php", handleExec)
+	http.HandleFunc("/api/v1/node", handleExec)
+	http.HandleFunc("/api/v1/ruby", handleExec)
+	http.HandleFunc("/api/v1/go", handleExec)
+	http.HandleFunc("/api/v1/dart", handleExec)
 	http.ListenAndServe(":10000", nil)
 }
 
@@ -21,7 +27,8 @@ type Editor struct {
 	Result string `json:result`
 }
 
-func handleExecPython(w http.ResponseWriter, r *http.Request) {
+// *** Python ***
+func handleExec(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -30,15 +37,18 @@ func handleExecPython(w http.ResponseWriter, r *http.Request) {
 
 	var result string
 
-	// リクエストbodyのjsonを構造体に変換
+	// json
 	body := make([]byte, r.ContentLength)
 	r.Body.Read(body)
 	var editor Editor
 	json.Unmarshal(body, &editor)
 
-	// touch file
-	file_name := writeFile(editor.Code)
-	result = dockerRun(file_name)
+	// language
+	str := string(r.URL.String())
+	language := strings.Replace(str, "/api/v1/", "", 1)
+
+	file_name := writeFile(editor.Code, language)
+	result = dockerRun(file_name, language)
 	editor.Result = result
 
 	exec.Command(
@@ -51,19 +61,30 @@ func handleExecPython(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	fmt.Println(string(editor_json))
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(editor_json)
 }
 
-
-func writeFile(code string) string {
+func writeFile(code string, language string) string {
 
 	t := time.Now()
-	file_name := t.Format(time.RFC3339) + ".py"
+	var file_name string
 
-	// コンテナ側に作ってホストと共有
+	switch language {
+		case "python":
+			file_name = t.Format(time.RFC3339) + ".py"
+		case "php":
+			file_name = t.Format(time.RFC3339) + ".php"
+		case "node":
+			file_name = t.Format(time.RFC3339) + ".js"
+		case "ruby":
+			file_name = t.Format(time.RFC3339) + ".rb"
+		case "go":
+			file_name = t.Format(time.RFC3339) + ".go"
+		case "dart":
+			file_name = t.Format(time.RFC3339) + ".dart"
+	}
+	
 	file_path := filepath.Join("go/src/work", file_name)
 
 	f, err := os.Create(file_path)
@@ -78,16 +99,14 @@ func writeFile(code string) string {
 	return file_name
 }
 
-// dockerで実行して結果を返す
-func dockerRun(file_name string) string {
+func dockerRun(file_name string, language string) string {
 
-	// コンテナ間マウント
 	cmd := exec.Command(
 		"docker","run","-i","--rm",
 		"--volumes-from","code",
 		"-w","/go/src/work",
-		"python:latest",
-		"python", file_name,
+		language,
+		language, file_name,
 	)
 
 	stdin, err := cmd.StdinPipe()
