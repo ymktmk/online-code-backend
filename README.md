@@ -1,6 +1,6 @@
 # オンライン実行環境のバックエンドです。
 
-##　アプリのURL
+## アプリのURL
 
 https://www.code-run.ga
 
