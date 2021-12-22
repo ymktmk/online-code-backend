@@ -1,3 +1,4 @@
+# S3
 resource "aws_s3_bucket" "online-code" {
     acl                         = "private"
     force_destroy               = false
@@ -7,11 +8,22 @@ resource "aws_s3_bucket" "online-code" {
     }
 }
 
+# パブリックブロックアクセス
+resource "aws_s3_bucket_public_access_block" "code-public-access" {
+    block_public_acls       = true
+    block_public_policy     = true
+    bucket                  = aws_s3_bucket.online-code.id
+    ignore_public_acls      = true
+    restrict_public_buckets = true
+}
+
+# バケットポリシー
 resource "aws_s3_bucket_policy" "code-bucket-policy" {
     bucket = aws_s3_bucket.online-code.id
     policy = jsonencode(
         {
             Statement = [
+                # cloudfrontからの通信のみ許可
                 # {
                 #     Action    = "s3:GetObject"
                 #     Effect    = "Allow"
