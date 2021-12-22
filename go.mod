@@ -1,3 +1,3 @@
-module example.com
+module code
 
 go 1.17
