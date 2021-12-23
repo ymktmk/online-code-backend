@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"time"
 )
 
 func main() {
@@ -23,8 +22,8 @@ func main() {
 }
 
 type Editor struct {
-	Code string `json:code`
-	Result string `json:result`
+	Code string `json:"code"`
+	Result string `json:"result"`
 }
 
 // *** Python ***
@@ -66,23 +65,22 @@ func handleExec(w http.ResponseWriter, r *http.Request) {
 }
 
 func writeFile(code string, language string) string {
-
-	t := time.Now()
+	
 	var file_name string
 
 	switch language {
 		case "python":
-			file_name = t.Format(time.RFC3339) + ".py"
+			file_name = "main.py"
 		case "php":
-			file_name = t.Format(time.RFC3339) + ".php"
+			file_name = "main.php"
 		case "node":
-			file_name = t.Format(time.RFC3339) + ".js"
+			file_name = "main.js"
 		case "ruby":
-			file_name = t.Format(time.RFC3339) + ".rb"
+			file_name = "main.rb"
 		case "go":
-			file_name = t.Format(time.RFC3339) + ".go"
+			file_name = "main.go"
 		case "dart":
-			file_name = t.Format(time.RFC3339) + ".dart"
+			file_name = "main.dart"
 	}
 	
 	file_path := filepath.Join("go/src/work", file_name)
