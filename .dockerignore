@@ -1,0 +1,10 @@
+.gitignore
+
+**/.terraform/*
+
+*.tfstate
+*.tfstate.*
+
+*.tfvars
+*.tfstate.backup
+*.lock.hcl

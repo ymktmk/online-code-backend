@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+    app:
+        container_name: online-code
+        build: .
+        tty: true
+        ports:
+            - "8080:8080"
+        command: ./main
+        volumes:
+            - ./:/go/src/work
+            - /var/run/docker.sock:/var/run/docker.sock

@@ -1,0 +1,59 @@
+{
+      "containerDefinitions": [
+            {
+                  "name": "code",
+                  "image": "009554248005.dkr.ecr.ap-northeast-1.amazonaws.com/onlinecode_app:a110e240b5bcc8d9aa7d563f950d5f5a83f3707c",
+                  "essential": true,
+                  "command": ["/main"],
+                  "portMappings" : [
+                        {
+                              "containerPort": 10000,
+                              "hostPort": 10000,
+                              "protocol": "tcp"
+                        }
+                  ],
+                  "mountPoints" : [
+                        {
+                              "containerPath" : "/go/src/work",
+                              "readOnly"      : false,
+                              "sourceVolume"  : "mount"
+                        },
+                        {
+                              "containerPath" : "/var/run/docker.sock",
+                              "sourceVolume"  : "socket"
+                        }
+                  ],
+                  "logConfiguration" : {
+                        "logDriver" : "awslogs",
+                        "options"   : {
+                              "awslogs-region"        : "ap-northeast-1",
+                              "awslogs-stream-prefix" : "aws_cloudwatch_log_group_online_code",
+                              "awslogs-group"         : "online-code-ecs"
+                        }
+                  }
+            }
+      ],
+      "runtimePlatform": {
+            "cpuArchitecture": "X86_64",
+            "operatingSystemFamily": "LINUX"
+      },
+      "executionRoleArn": "ecsTaskExecutionRole",
+      "family": "online-code",
+      "cpu": "256",
+      "memory": "512",
+      "requiresCompatibilities": ["EC2"],
+      "volumes": [
+            {
+                  "name": "mount",
+                  "host": {
+                        "sourcePath": "/"
+                  }
+            },
+            {
+                  "name": "socket",
+                  "host": {
+                        "sourcePath": "/var/run/docker.sock"
+                  }
+            }
+      ]
+}
