@@ -42,7 +42,7 @@ jobs:
     # terraform apply
     - name: Terraform Apply
         id: apply
-        working-directory: ./
+        working-directory: ./terraform
         run: |
           terraform init
           terraform workspace select stg
