@@ -41,12 +41,12 @@ jobs:
 
     # terraform apply
     - name: Terraform Apply
-        id: apply
-        working-directory: ./terraform
-        run: |
-          terraform init
-          terraform workspace select stg
-          terraform apply -auto-approve
+      id: apply
+      working-directory: ./terraform
+      run: |
+        terraform init
+        terraform workspace select stg
+        terraform apply -auto-approve
     
     - name: Login to Amazon ECR
       id: login-ecr
