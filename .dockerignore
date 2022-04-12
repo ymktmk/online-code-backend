@@ -8,3 +8,6 @@
 *.tfvars
 *.tfstate.backup
 *.lock.hcl
+
+ymktmk
+ymktmk.pub
