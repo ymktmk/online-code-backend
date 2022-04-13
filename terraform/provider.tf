@@ -12,7 +12,7 @@ terraform {
         }
     }
     backend "s3" {
-        bucket = "terraform-state"
+        bucket = "terraform-state-ymktmk"
         region = "ap-northeast-1"
         profile = "default"
         key = "terraform.tfstate"
@@ -22,7 +22,7 @@ terraform {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-    bucket = "terraform-state"
+    bucket = "terraform-state-ymktmk"
     lifecycle {
         prevent_destroy = true
     }
