@@ -1,13 +1,6 @@
 .gitignore
 
-**/.terraform/*
-
-*.tfstate
-*.tfstate.*
-
-*.tfvars
-*.tfstate.backup
-*.lock.hcl
+terraform
 
 ymktmk
 ymktmk.pub

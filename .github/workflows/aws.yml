@@ -11,7 +11,8 @@ env:
   ECR_REPOSITORY: online-code
   ECS_SERVICE: online-code
   ECS_CLUSTER: online-code
-  ECS_TASK_DEFINITION: task-definition.json
+  # プロジェクトからのパス
+  ECS_TASK_DEFINITION: .github/workflows/task-definition.json
   CONTAINER_NAME: code
 
 jobs:
@@ -70,7 +71,7 @@ jobs:
       with:
         task-definition: ${{ env.ECS_TASK_DEFINITION }}
         container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.CONTAINER_NAME }}:${{ github.sha }}
 
     # ECSにデプロイ
     - name: Deploy Amazon ECS task definition
