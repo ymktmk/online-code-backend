@@ -1,6 +1,5 @@
 .gitignore
 
-terraform
+.github
 
-ymktmk
-ymktmk.pub
+terraform

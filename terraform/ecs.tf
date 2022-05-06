@@ -1,6 +1,6 @@
 # クラスター
 resource "aws_ecs_cluster" "cluster" {
-    name = "cluster"
+    name = "online-code-cluster"
     # 既存のリソースが有った場合に、一旦削除してから作り直すようになります
     lifecycle {
         create_before_destroy = true
@@ -12,18 +12,16 @@ resource "aws_ecs_task_definition" "task_definition" {
     container_definitions    = jsonencode(
         [
             {
-                command          = ["/main",]
+                command          = ["/main"]
                 cpu              = 0
                 essential        = true
-                # ECRのイメージ
-                image            = "009554248005.dkr.ecr.ap-northeast-1.amazonaws.com/onlinecode_app:9d12662e7c4ba57a5bfda27df1df8db9ad294cd3"
-                # CloudWatchのログ
+                image            = ""
                 logConfiguration = {
                     logDriver = "awslogs"
                     options   = {
                         awslogs-region        = "ap-northeast-1"
-                        awslogs-stream-prefix = aws_cloudwatch_log_group.log_group_for_ecs.name
-                        awslogs-group         = "online-code"
+                        awslogs-stream-prefix = "online-code"
+                        awslogs-group         = aws_cloudwatch_log_group.log_group_for_ecs.name
                     }
                 }
                 mountPoints      = [
@@ -36,6 +34,10 @@ resource "aws_ecs_task_definition" "task_definition" {
                         containerPath = "/var/run/docker.sock"
                         sourceVolume  = "socket"
                     },
+                    {
+                        containerPath = "/var/www/.cache"
+                        sourceVolume  = "cache"
+                    }
                 ]
                 name             = "code"
                 portMappings     = [
@@ -60,11 +62,15 @@ resource "aws_ecs_task_definition" "task_definition" {
         host_path = "/var/run/docker.sock"
         name      = "socket"
     }
+    volume {
+        host_path = "/var/www/.cache"
+        name      = "cache"
+    }
 }
 
 # サービス
 resource "aws_ecs_service" "service" {
-    name                               = "service"
+    name                               = "online-code-service"
     cluster                            = aws_ecs_cluster.cluster.id
     deployment_maximum_percent         = 100
     deployment_minimum_healthy_percent = 0
