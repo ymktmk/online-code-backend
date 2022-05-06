@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "task_definition" {
                 command          = ["/main"]
                 cpu              = 0
                 essential        = true
-                image            = ""
+                image            = "009554248005.dkr.ecr.ap-northeast-1.amazonaws.com/online-code:latest"
                 logConfiguration = {
                     logDriver = "awslogs"
                     options   = {
@@ -42,8 +42,13 @@ resource "aws_ecs_task_definition" "task_definition" {
                 name             = "code"
                 portMappings     = [
                     {
-                        containerPort = 10000
-                        hostPort      = 10000
+                        containerPort = 443
+                        hostPort      = 443
+                        protocol      = "tcp"
+                    },
+                    {
+                        containerPort = 80
+                        hostPort      = 80
                         protocol      = "tcp"
                     },
                 ]
