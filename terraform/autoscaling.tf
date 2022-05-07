@@ -1,12 +1,13 @@
 # AutoScaling EC2起動設定
 resource "aws_launch_configuration" "ecs_launch_config" {
-      name                 = aws_ecs_cluster.cluster.name
+      name                 = "online-code-cluster"
       image_id             = data.aws_ami.ami.id
       iam_instance_profile = aws_iam_instance_profile.ecs_instance_role.name
       security_groups      = [aws_security_group.security_group.id]
+      # クラスター名
       user_data            = <<EOF
 #!/bin/bash
-echo ECS_CLUSTER=cluster >> /etc/ecs/ecs.config;
+echo ECS_CLUSTER=online-code-cluster >> /etc/ecs/ecs.config;
 EOF
       instance_type        = "t2.micro"
       key_name               = aws_key_pair.key_pair.id

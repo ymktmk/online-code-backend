@@ -1,10 +1,10 @@
 # ECSクラスターに存在するEC2
 # セキュリティーグループ
 resource "aws_security_group" "security_group" {
-      name = "golang-ssl-server-sg"
+      name = "online-code"
       vpc_id = aws_vpc.vpc.id
       tags = {
-            Name = "golang-ssl-server-sg"
+            Name = "online-code-sg"
       }
 }
 

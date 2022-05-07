@@ -1,13 +1,14 @@
 package controller
 
 import (
-	"code/app/domain"
-	"code/app/utils"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/ymktmk/online-code-backend/app/domain"
+	"github.com/ymktmk/online-code-backend/app/utils"
+
+	"github.com/labstack/echo/v4"
 )
 
 func HandleExec(c echo.Context) (err error) {
@@ -28,17 +29,17 @@ func HandleExec(c echo.Context) (err error) {
 			channel <- result
 		}()
 		select {
-			// not time out
-			case result := <-channel:
-				editor.Result = result
-				utils.DeleteFile(file_name)
-				return c.JSON(http.StatusOK, editor)
-			// time out
-			case <-time.After(3 * time.Second):
-				utils.DockerKill(language)
-				editor.Result = "Error: TimeOut"
-				utils.DeleteFile(file_name)
-				return c.JSON(http.StatusOK, editor)
+		// not time out
+		case result := <-channel:
+			editor.Result = result
+			utils.DeleteFile(file_name)
+			return c.JSON(http.StatusOK, editor)
+		// time out
+		case <-time.After(3 * time.Second):
+			utils.DockerKill(language)
+			editor.Result = "Error: TimeOut"
+			utils.DeleteFile(file_name)
+			return c.JSON(http.StatusOK, editor)
 		}
 	}
 }
