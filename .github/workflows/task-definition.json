@@ -3,6 +3,7 @@
             {
                   "name": "code",
                   "image": "",
+                  "cpu":  0,
                   "essential": true,
                   "command": ["/main"],
                   "portMappings" : [
