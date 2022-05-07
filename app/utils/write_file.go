@@ -28,7 +28,6 @@ func WriteFile(code string, language string) string {
 	file_path := filepath.Join("go/src/work", file_name)
 
 	f, err := os.Create(file_path)
-
 	if err != nil {
 		log.Println(err)
 	}

@@ -24,10 +24,10 @@ func DockerRun(file_name string, language string) string {
 	io.WriteString(stdin, "hoge foo bar")
 	stdin.Close()
 
-	out, err := cmd.CombinedOutput()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Println(err)
 	}
 
-	return string(out)
+	return string(output)
 }

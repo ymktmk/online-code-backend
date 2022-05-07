@@ -28,17 +28,17 @@ func HandleExec(c echo.Context) (err error) {
 			channel <- result
 		}()
 		select {
-		// not time out
-		case result := <-channel:
-			editor.Result = result
-			utils.DeleteFile(file_name)
-			return c.JSON(http.StatusOK, editor)
-		// time out
-		case <-time.After(3 * time.Second):
-			utils.DockerKill(language)
-			editor.Result = "Error: TimeOut"
-			utils.DeleteFile(file_name)
-			return c.JSON(http.StatusOK, editor)
+			// not time out
+			case result := <-channel:
+				editor.Result = result
+				utils.DeleteFile(file_name)
+				return c.JSON(http.StatusOK, editor)
+			// time out
+			case <-time.After(3 * time.Second):
+				utils.DockerKill(language)
+				editor.Result = "Error: TimeOut"
+				utils.DeleteFile(file_name)
+				return c.JSON(http.StatusOK, editor)
 		}
 	}
 }
