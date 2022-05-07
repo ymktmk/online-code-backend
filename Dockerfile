@@ -4,9 +4,6 @@ RUN mkdir /go/src/work
 
 WORKDIR /go/src/work
 
-# COPY main.go .
-# COPY go.mod .
-# COPY go.sum .
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build main.go
