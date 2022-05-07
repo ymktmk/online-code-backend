@@ -6,3 +6,6 @@
 *.tfvars
 *.tfstate.backup
 *.lock.hcl
+
+online-code
+online-code.pub
