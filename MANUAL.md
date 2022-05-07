@@ -3,7 +3,7 @@
 ```
 ssh-keygen -t rsa -f online-code -N ''
 ```
-* ssh -i ./online-code ec2-user@<IP>
+* ssh -i ./online-code ec2-user@52.199.17.202
 
 ## ECRを作成する
 

@@ -1,6 +1,6 @@
 # AutoScaling EC2起動設定
 resource "aws_launch_configuration" "ecs_launch_config" {
-      name                 = "cluster"
+      name                 = aws_ecs_cluster.cluster.name
       image_id             = data.aws_ami.ami.id
       iam_instance_profile = aws_iam_instance_profile.ecs_instance_role.name
       security_groups      = [aws_security_group.security_group.id]
