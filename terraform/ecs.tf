@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "task_definition" {
                 command          = ["/main"]
                 cpu              = 0
                 essential        = true
-                image            = "009554248005.dkr.ecr.ap-northeast-1.amazonaws.com/online-code:latest"
+                image            = "009554248005.dkr.ecr.ap-northeast-1.amazonaws.com/online-code:730494abb67ee79978818212ceba1a42fa2746e9"
                 logConfiguration = {
                     logDriver = "awslogs"
                     options   = {

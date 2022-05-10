@@ -17,6 +17,8 @@ resource "aws_iam_role" "ecs_instance_role" {
 EOF
 }
 
+# すでに作成されているポリシーをアタッチする
+
 # ECSタスクの実行権限
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
 	role = aws_iam_role.ecs_instance_role.name
