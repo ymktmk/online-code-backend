@@ -4,7 +4,7 @@ resource "aws_launch_configuration" "ecs_launch_config" {
       image_id             = data.aws_ami.ami.id
       iam_instance_profile = aws_iam_instance_profile.ecs_instance_role.name
       security_groups      = [aws_security_group.security_group.id]
-      # クラスター名
+      # 起動時のシェルスクリプト
       user_data            = <<EOF
 #!/bin/bash
 echo ECS_CLUSTER=online-code-cluster >> /etc/ecs/ecs.config;
