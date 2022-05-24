@@ -8,6 +8,8 @@ resource "aws_launch_configuration" "ecs_launch_config" {
       user_data            = <<EOF
 #!/bin/bash
 echo ECS_CLUSTER=online-code-cluster >> /etc/ecs/ecs.config;
+INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
+aws ec2 associate-address --allocation-id ${aws_eip.eip.allocation_id} --instance $INSTANCE_ID
 EOF
       instance_type        = "t2.micro"
       key_name               = aws_key_pair.key_pair.id
