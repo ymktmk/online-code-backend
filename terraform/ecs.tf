@@ -1,7 +1,5 @@
-# クラスター
 resource "aws_ecs_cluster" "cluster" {
     name = "online-code-cluster"
-    # 既存のリソースが有った場合に、一旦削除してから作り直すようになります
     lifecycle {
         create_before_destroy = true
     }

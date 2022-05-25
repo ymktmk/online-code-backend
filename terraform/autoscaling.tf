@@ -1,4 +1,3 @@
-# AutoScaling EC2起動設定
 resource "aws_launch_configuration" "ecs_launch_config" {
       name                 = "online-code-cluster"
       image_id             = data.aws_ami.ami.id
@@ -18,7 +17,6 @@ EOF
       }
 }
 
-# AutoScaling Group
 resource "aws_autoscaling_group" "ecs_autoscaling_group" {
       name                      = "ecs_autoscaling_group"
       vpc_zone_identifier       = [aws_subnet.public_subnet.id]
